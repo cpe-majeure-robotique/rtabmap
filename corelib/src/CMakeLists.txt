@@ -904,6 +904,9 @@ IF(CUVSLAM_USING_BUNDLED)
       "${CUVSLAM_LIBRARY}"
       "$<TARGET_FILE_DIR:rtabmap_core>/libcuvslam.so"
     COMMENT "Copying the selected bundled cuVSLAM runtime")
+  # Keep runtime directories contributed by optional dependencies (notably
+  # Torch and ROS libraries) when adding the colocated cuVSLAM runtime.
+  SET_PROPERTY(TARGET rtabmap_core PROPERTY INSTALL_RPATH_USE_LINK_PATH TRUE)
   SET_PROPERTY(TARGET rtabmap_core APPEND PROPERTY INSTALL_RPATH "$ORIGIN")
 ENDIF()
 
