@@ -12,3 +12,5 @@ compile_flags.txt
 tags
 build_*
 *.bak
+
+build/
