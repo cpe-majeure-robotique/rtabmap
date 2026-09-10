@@ -686,7 +686,18 @@ class RTABMAP_CORE_EXPORT Parameters
     RTABMAP_PARAM(OdomOpen3D, Method,           int, 0,  "Registration method: 0=PointToPlane, 1=Intensity, 2=Hybrid.");
 
     // Odometry cuVSLAM
-    RTABMAP_PARAM(OdomCuVSLAM, MulticamMode,        int, 0,  "cuVSLAM multicam_mode setting: 0=moderate, 1=performance, 2=precision.");
+    RTABMAP_PARAM(OdomCuVSLAM, MulticamMode,                 int,    0,      "cuVSLAM multicam_mode setting: 0=moderate, 1=performance, 2=precision.");
+    RTABMAP_PARAM(OdomCuVSLAM, UseRawCovariance,             bool,   false,  "Forward the sanitized cuVSLAM covariance without scale calibration or temporal decrease smoothing.");
+    RTABMAP_PARAM(OdomCuVSLAM, CovariancePositionScale,      double, 1.0,    "Variance scale applied to the translational part of the cuVSLAM covariance.");
+    RTABMAP_PARAM(OdomCuVSLAM, CovarianceOrientationScale,   double, 1.0,    "Variance scale applied to the rotational part of the cuVSLAM covariance.");
+    RTABMAP_PARAM(OdomCuVSLAM, CovariancePositionFloor,      double, 1e-6,   "Minimum translational variance [m^2] reported to RTAB-Map.");
+    RTABMAP_PARAM(OdomCuVSLAM, CovarianceOrientationFloor,   double, 1e-6,   "Minimum rotational variance [rad^2] reported to RTAB-Map.");
+    RTABMAP_PARAM(OdomCuVSLAM, CovariancePositionCeiling,    double, 100.0,  "Maximum finite translational variance [m^2] used for numerical stability.");
+    RTABMAP_PARAM(OdomCuVSLAM, CovarianceOrientationCeiling, double, 9.8696, "Maximum finite rotational variance [rad^2] used for numerical stability.");
+    RTABMAP_PARAM(OdomCuVSLAM, CovarianceFallbackPosition,   double, 0.25,   "Conservative translational variance [m^2] used when cuVSLAM reports an invalid value.");
+    RTABMAP_PARAM(OdomCuVSLAM, CovarianceFallbackOrientation,double, 0.1,    "Conservative rotational variance [rad^2] used when cuVSLAM reports an invalid value.");
+    RTABMAP_PARAM(OdomCuVSLAM, CovarianceDecreaseSmoothing,  double, 0.9,    "One-sided covariance smoothing in [0,1): increases are immediate, decreases are smoothed. 0 disables smoothing.");
+    RTABMAP_PARAM(OdomCuVSLAM, MinLandmarks,                 int,    0,      "Minimum exported landmarks required on initialization. 0 trusts a valid cuVSLAM pose and disables this additional rejection.");
 
     // Odometry LIO-SAM
     RTABMAP_PARAM_STR(OdomLIOSAM, ConfigPath,  "", "Path to LIO-SAM params.yaml config file. When set, sensor/IMU/feature parameters are loaded from the file and the individual parameters below are ignored.");

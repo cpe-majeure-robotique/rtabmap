@@ -36,7 +36,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef RTABMAP_CUVSLAM
 #include <cuvslam.h>
-#include <ground_constraint.h>
 #include <cuda_runtime.h>
 #endif
 
@@ -57,11 +56,10 @@ private:
 
 private:
 #ifdef RTABMAP_CUVSLAM
-	CUVSLAM_TrackerHandle cuvslam_handle_;
-	CUVSLAM_GroundConstraintHandle ground_constraint_handle_;
+	std::unique_ptr<cuvslam::Odometry> cuvslam_handle_;
+	std::unique_ptr<cuvslam::GroundConstraint> ground_constraint_handle_;
 
-	std::vector<CUVSLAM_Camera> cuvslam_cameras_;
-	std::vector<std::array<float, 12>> intrinsics_;
+	cuvslam::Rig cuvslam_rig_;
 	
 	// State tracking
 	bool initialized_;
@@ -70,29 +68,36 @@ private:
 	bool planar_constraints_;
 	int multicam_mode_;
 	Transform previous_pose_;
-	double last_timestamp_;
 
-	// Configuration Thresholds
-	double velocity_ratio_threshold_high_ = 1.5;			// The maximum velocity ratio of guess / estimated velocity needed to detect lost state.
-	double velocity_ratio_threshold_low_ = 0.5;				// The minimum velocity ratio of guess / estimated velocity needed to detect lost state.
-	double velocity_difference_threshold_ = 0.1;			// The maximum velocity difference between the guess and the estimated velocity needed to detect lost state.
-	double zero_estimated_velocity_threshold_ = 0.00001;	// The minimum cuVSLAM estimated velocity needed to detect lost state.
-	double min_landmarks_threshold_ = 30; 					// The minimum number of landmarks needed to start tracking after an initialization.
-	
-	// Forward cuVLSAM covariance directly to RTAB-Map.
-	// When true this disables covariance based lost detection.
-	bool use_raw_covariance_  = false;
+	// Covariance policy. cuVSLAM provides an absolute pose covariance while
+	// RTAB-Map exposes one registration covariance to both its graph and ROS.
+	// Keep this estimate conservative, finite and positive definite. The ROS
+	// wrapper intentionally applies its historical x2 factor to pose covariance.
+	bool use_raw_covariance_;
+	double covariance_position_scale_;
+	double covariance_orientation_scale_;
+	double covariance_position_floor_;
+	double covariance_orientation_floor_;
+	double covariance_position_ceiling_;
+	double covariance_orientation_ceiling_;
+	double covariance_fallback_position_;
+	double covariance_fallback_orientation_;
+	double covariance_decrease_smoothing_;
+	int min_landmarks_threshold_;
+	cv::Mat previous_covariance_;
 
 	//visualization
-	std::vector<CUVSLAM_Observation> observations_;
-	std::vector<CUVSLAM_Landmark> landmarks_;
+	std::vector<cuvslam::Observation> observations_;
+	std::vector<cuvslam::Landmark> landmarks_;
 	
 	// GPU memory management
-	std::vector<uint8_t *> gpu_left_image_data_; // pointers to all gpu images
-	std::vector<uint8_t *> gpu_right_image_data_;
-	std::vector<size_t> gpu_left_image_sizes_; // size of one image
-	std::vector<size_t> gpu_right_image_sizes_;
-	cudaStream_t cuda_stream_;
+		std::vector<uint8_t *> gpu_left_image_data_; // pointers to all gpu images
+		std::vector<uint8_t *> gpu_right_image_data_;
+		std::vector<uint8_t *> gpu_depth_image_data_;
+		std::vector<size_t> gpu_left_image_sizes_; // size of one image
+		std::vector<size_t> gpu_right_image_sizes_;
+		std::vector<size_t> gpu_depth_image_sizes_;
+		cudaStream_t cuda_stream_;
 #endif
 };
 

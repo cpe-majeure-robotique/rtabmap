@@ -104,6 +104,7 @@ SET(SRC_FILES
     odometry/OdometryOpenVINS.cpp
     odometry/OdometryOpen3D.cpp
 	odometry/OdometryCuVSLAM.cpp
+	odometry/CuVSLAMCovariance.cpp
     
     IMU.cpp
     IMUThread.cpp
@@ -893,6 +894,19 @@ TARGET_LINK_LIBRARIES(rtabmap_core
     ${PUBLIC_LIBRARIES}
   PRIVATE 
     ${LIBRARIES})
+
+IF(BUILD_TESTING AND CUVSLAM_FOUND)
+  ADD_EXECUTABLE(test_cuvslam_covariance EXCLUDE_FROM_ALL
+    ../tests/test_cuvslam_covariance.cpp
+    odometry/CuVSLAMCovariance.cpp)
+  TARGET_INCLUDE_DIRECTORIES(test_cuvslam_covariance PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CUVSLAM_INCLUDE_DIRS}
+    ${OpenCV_INCLUDE_DIRS})
+  TARGET_LINK_LIBRARIES(test_cuvslam_covariance PRIVATE
+    opencv_core)
+  ADD_TEST(NAME test_cuvslam_covariance COMMAND test_cuvslam_covariance)
+ENDIF()
 
 SET_TARGET_PROPERTIES(
      rtabmap_core
