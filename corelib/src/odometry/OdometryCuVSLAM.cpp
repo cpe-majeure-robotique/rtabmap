@@ -39,7 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "rtabmap/core/Transform.h"
 #include "rtabmap/core/util3d_transforms.h"
 #include "CuVSLAMCovariance.h"
-#include <cuvslam.h>
+#include <cuvslam/cuvslam2.h>
+#include <cuvslam/ground_constraint2.h>
 #include <opencv2/opencv.hpp>
 #include <eigen3/Eigen/Dense>
 #include <cuda_runtime.h>

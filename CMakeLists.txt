@@ -946,6 +946,17 @@ IF(WITH_CUVSLAM)
     FIND_PACKAGE(CuVSLAM 15.0.0)
     IF(CUVSLAM_FOUND)
         MESSAGE(STATUS "Found cuVSLAM: ${CUVSLAM_INCLUDE_DIRS}")
+        IF(CUVSLAM_USING_BUNDLED)
+            INSTALL(FILES "${CUVSLAM_LIBRARY}"
+                DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+                COMPONENT runtime)
+            INSTALL(FILES "${PROJECT_SOURCE_DIR}/third_party/cuvslam/15.0.0/LICENSE"
+                DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_NAME}/licenses/cuvslam"
+                COMPONENT runtime)
+            INSTALL(DIRECTORY "${PROJECT_SOURCE_DIR}/third_party/cuvslam/15.0.0/include/cuvslam"
+                DESTINATION "${INSTALL_INCLUDE_DIR}"
+                COMPONENT devel)
+        ENDIF()
     ENDIF()
 ENDIF(WITH_CUVSLAM)
 
@@ -954,16 +965,21 @@ IF(NOT (APPLE OR WIN32) AND BUILD_WITH_RPATH_NOT_RUNPATH)
     ADD_LINK_OPTIONS(LINKER:${DISABLE_NEW_DTAGS_FLAG})
 ENDIF()
 
+IF(MSVC AND CUVSLAM_FOUND)
+    SET(CMAKE_CXX_STANDARD 17)
+    SET(CMAKE_CXX_STANDARD_REQUIRED ON)
+ENDIF()
+
 IF(NOT MSVC)
-    IF(Qt6_FOUND OR (G2O_FOUND AND G2O_CPP11 EQUAL 1) OR (GTSAM_FOUND AND GTSAM_VERSION VERSION_GREATER_EQUAL "4.3.0") OR TORCH_FOUND OR MRPT_FOUND)
-      # Qt6 requires c++17
+    IF(CUVSLAM_FOUND OR Qt6_FOUND OR (G2O_FOUND AND G2O_CPP11 EQUAL 1) OR (GTSAM_FOUND AND GTSAM_VERSION VERSION_GREATER_EQUAL "4.3.0") OR TORCH_FOUND OR MRPT_FOUND)
+      # cuVSLAM 15 and Qt6 require C++17.
       include(CheckCXXCompilerFlag)
       CHECK_CXX_COMPILER_FLAG("-std=c++17" COMPILER_SUPPORTS_CXX17)
       IF(COMPILER_SUPPORTS_CXX17)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
         set(CMAKE_CXX_STANDARD 17)
       ELSE()
-        message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++17 support. Please use a different C++ compiler if you want to use Qt6.")
+        message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++17 support. Please use a different C++ compiler if you want to use cuVSLAM 15 or Qt6.")
       ENDIF()
     ENDIF()
     IF((NOT (${CMAKE_CXX_STANDARD} STREQUAL "17")) AND (msckf_vio_FOUND OR loam_velodyne_FOUND OR floam_FOUND OR PCL_VERSION VERSION_GREATER "1.9.1" OR G2O_FOUND OR CCCoreLib_FOUND OR Open3D_FOUND))
@@ -2001,7 +2017,7 @@ MESSAGE(STATUS "  With ORB_SLAM             = NO (ORB_SLAM2 and ORB_SLAM3 not fo
 ENDIF()
 
 IF(CUVSLAM_FOUND)
-MESSAGE(STATUS "  With cuVSLAM              = YES (License: NVIDIA ISAAC ROS SOFTWARE LICENSE)")
+    MESSAGE(STATUS "  With cuVSLAM              = YES (License: NVIDIA Community License)")
 ELSEIF(NOT WITH_CUVSLAM)
 MESSAGE(STATUS "  With cuVSLAM              = NO (WITH_CUVSLAM=OFF)")
 ELSE()

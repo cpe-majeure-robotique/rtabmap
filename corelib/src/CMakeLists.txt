@@ -895,6 +895,18 @@ TARGET_LINK_LIBRARIES(rtabmap_core
   PRIVATE 
     ${LIBRARIES})
 
+IF(CUVSLAM_USING_BUNDLED)
+  IF(NOT APPLE AND NOT WIN32)
+    TARGET_LINK_OPTIONS(rtabmap_core PRIVATE "LINKER:--disable-new-dtags")
+  ENDIF()
+  ADD_CUSTOM_COMMAND(TARGET rtabmap_core POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+      "${CUVSLAM_LIBRARY}"
+      "$<TARGET_FILE_DIR:rtabmap_core>/libcuvslam.so"
+    COMMENT "Copying the selected bundled cuVSLAM runtime")
+  SET_PROPERTY(TARGET rtabmap_core APPEND PROPERTY INSTALL_RPATH "$ORIGIN")
+ENDIF()
+
 IF(BUILD_TESTING AND CUVSLAM_FOUND)
   ADD_EXECUTABLE(test_cuvslam_covariance EXCLUDE_FROM_ALL
     ../tests/test_cuvslam_covariance.cpp
@@ -903,6 +915,7 @@ IF(BUILD_TESTING AND CUVSLAM_FOUND)
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CUVSLAM_INCLUDE_DIRS}
     ${OpenCV_INCLUDE_DIRS})
+  TARGET_COMPILE_FEATURES(test_cuvslam_covariance PRIVATE cxx_std_17)
   TARGET_LINK_LIBRARIES(test_cuvslam_covariance PRIVATE
     opencv_core)
   ADD_TEST(NAME test_cuvslam_covariance COMMAND test_cuvslam_covariance)

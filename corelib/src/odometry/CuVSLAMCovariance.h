@@ -10,7 +10,7 @@ tests, but is not part of RTAB-Map's public API.
 #define RTABMAP_CUVSLAM_COVARIANCE_H_
 
 #include <opencv2/core/core.hpp>
-#include <cuvslam.h>
+#include <cuvslam/cuvslam2.h>
 
 namespace rtabmap {
 

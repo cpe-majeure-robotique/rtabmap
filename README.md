@@ -23,6 +23,25 @@ RTAB-Map library and standalone application.
 
 To use RTAB-Map under ROS, visit the [rtabmap](http://wiki.ros.org/rtabmap) page on the ROS wiki.
 
+### Bundled cuVSLAM 15 support
+
+This fork includes the NVIDIA cuVSLAM 15.0.0 C++ runtime for CUDA 12/13,
+Ubuntu 22.04/24.04 and `aarch64`/`x86_64`. A matching runtime is selected and
+installed automatically when cuVSLAM support is enabled:
+
+```bash
+cmake -S . -B build -DWITH_CUVSLAM=ON
+cmake --build build -j
+sudo cmake --install build
+```
+
+CUDA must still be installed on the host. Cross-compilation can override the
+automatic selection with `CUVSLAM_BUNDLED_CUDA_VERSION`,
+`CUVSLAM_BUNDLED_UBUNTU_VERSION` and `CUVSLAM_BUNDLED_ARCH`. Set
+`CUVSLAM_USE_BUNDLED=OFF` or provide `CUVSLAM_ROOT_DIR` to use an external
+installation. See [`third_party/cuvslam/15.0.0`](third_party/cuvslam/15.0.0)
+for provenance, checksums and NVIDIA's license terms.
+
 ### Acknowledgements
 This project is supported by [IntRoLab - Intelligent / Interactive / Integrated / Interdisciplinary Robot Lab](https://introlab.3it.usherbrooke.ca/), Sherbrooke, Québec, Canada.
 

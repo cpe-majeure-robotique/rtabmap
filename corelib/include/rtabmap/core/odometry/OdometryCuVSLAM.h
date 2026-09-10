@@ -35,7 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <array>
 
 #ifdef RTABMAP_CUVSLAM
-#include <cuvslam.h>
+#include <cuvslam/cuvslam2.h>
+#include <cuvslam/ground_constraint2.h>
 #include <cuda_runtime.h>
 #endif
 
